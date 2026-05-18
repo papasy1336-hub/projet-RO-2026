@@ -1,0 +1,292 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+
+\geometry{margin=2.5cm}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{red},
+  frame=single,
+  breaklines=true,
+  showstringspaces=false
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Recherche Opérationnelle 2025--2026}
+\lhead{Université  -- Mauritanie}
+\cfoot{\thepage}
+
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  \vspace*{2cm}
+  {\Large \textbf{Université mauritanie}\\
+  Faculté des Sciences technique\\[0.5cm]}
+  \rule{\linewidth}{0.5mm}\\[1cm]
+  {\Huge \textbf{Rapport de Projet}}\\[0.5cm]
+  {\LARGE Recherche Opérationnelle}\\[0.3cm]
+  {\large Licence -- Année 2025--2026}\\[1cm]
+  \rule{\linewidth}{0.5mm}\\[1cm]
+  {\large \textbf{Sujets traités :}}\\[0.5cm]
+  {\large
+  \textbf{1.3} Problème du Sac à dos (Knapsack)\\[0.3cm]
+  \textbf{1.1} Optimisation du Transport\\[0.3cm]
+  \textbf{6.1} Transport de Poissons (Nouadhibou -- Nouakchott)\\
+  }
+  \vfill
+  {\large
+  \textbf{Responsable :} Dr. EL BENANY Med Mahmoud\\[0.3cm]
+  \textbf{Étudiant :} [abdoulay hamet sy\\ matricule:c26058]\\[0.3cm]
+  \textbf{Date :} 18 Mai 2026
+  }
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+%==============================================
+\section{Introduction}
+%==============================================
+
+La Recherche Opérationnelle est une discipline qui utilise les
+mathématiques et les méthodes d'optimisation pour résoudre des
+problèmes complexes.
+
+Dans ce projet, nous avons utilisé Python pour traiter trois
+problèmes principaux :
+\begin{itemize}
+  \item le problème du Sac à dos avec la programmation dynamique ;
+  \item l'optimisation du transport de marchandises ;
+  \item le transport de poissons frais en Mauritanie.
+\end{itemize}
+
+L'objectif général est de maximiser la valeur, minimiser les coûts
+et optimiser les ressources disponibles.
+
+Tous les codes sont disponibles sur GitHub :
+\url{https://github.com/papasy1336-hub/projet-RO-2026}
+
+%==============================================
+\section{Problème du Sac à dos (Knapsack)}
+%==============================================
+
+\subsection{Description}
+Le fichier \texttt{knapsack.py} traite le problème du sac à dos.
+L'objectif est de sélectionner des objets pour maximiser la valeur
+totale tout en respectant une contrainte de capacité maximale.
+
+\subsection{Extrait du code}
+
+\begin{lstlisting}
+x = LpVariable.dicts("x", objets, cat="Binary")
+\end{lstlisting}
+
+\subsection{Modèle mathématique}
+
+Le modèle utilisé est la programmation linéaire en nombres entiers.
+Les variables de décision sont :
+
+\[
+x_i = \begin{cases} 1 & \text{si l'objet } i \text{ est sélectionné} \\ 0 & \text{sinon} \end{cases}
+\]
+
+\subsection{Fonction objectif}
+
+La fonction objectif est :
+\[
+\max Z = 3x_1 + 4x_2 + 5x_3
+\]
+
+Dans le programme :
+\begin{lstlisting}
+modele += lpSum(valeurs[i] * x[i] for i in objets)
+\end{lstlisting}
+
+\subsection{Contraintes}
+
+La contrainte de capacité est :
+\[
+2x_1 + 3x_2 + 4x_3 \leq 5
+\]
+
+Dans le programme :
+\begin{lstlisting}
+modele += lpSum(poids[i] * x[i] for i in objets) <= capacite
+\end{lstlisting}
+
+\subsection{Résultat obtenu}
+
+\begin{lstlisting}
+Statut : Optimal
+Objet 1 (poids=2, valeur=3) -> PRIS
+Objet 2 (poids=3, valeur=4) -> PRIS
+Objet 3 (poids=4, valeur=5) -> non pris
+
+Valeur totale = 7
+\end{lstlisting}
+
+La solution optimale permet de maximiser la valeur totale à
+\textbf{7} avec un poids total de 5 (= capacité maximale).
+
+%==============================================
+\section{Optimisation du Transport}
+%==============================================
+
+\subsection{Description}
+Le fichier \texttt{transport.py} traite le problème classique
+de transport. L'objectif est de transporter des marchandises
+entre plusieurs sources et plusieurs destinations avec un coût
+minimal.
+
+\subsection{Variables de décision}
+
+Les variables $x_{ij}$ représentent la quantité transportée
+de la source $i$ vers la destination $j$.
+
+\begin{lstlisting}
+x11 = LpVariable('x11', lowBound=0)
+x12 = LpVariable('x12', lowBound=0)
+x13 = LpVariable('x13', lowBound=0)
+
+x21 = LpVariable('x21', lowBound=0)
+x22 = LpVariable('x22', lowBound=0)
+x23 = LpVariable('x23', lowBound=0)
+\end{lstlisting}
+
+\subsection{Fonction objectif}
+
+La fonction objectif est :
+\[
+\min Z = 2x_{11} + 3x_{12} + x_{13} + 5x_{21} + 4x_{22} + 8x_{23}
+\]
+
+Dans le programme :
+\begin{lstlisting}
+modele += lpSum(couts[i,j] * x[i,j]
+                for i in usines for j in entrepots)
+\end{lstlisting}
+
+\subsection{Contraintes}
+
+Les contraintes de capacité des usines sont :
+\[
+x_{11} + x_{12} + x_{13} \leq 100
+\]
+\[
+x_{21} + x_{22} + x_{23} \leq 150
+\]
+
+Les contraintes de demande des entrepôts sont :
+\[
+x_{11} + x_{21} = 80
+\]
+\[
+x_{12} + x_{22} = 120
+\]
+\[
+x_{13} + x_{23} = 50
+\]
+
+\subsection{Résultat obtenu}
+
+\begin{lstlisting}
+Usine 1 -> Entrepot 1 : 50 unites
+Usine 1 -> Entrepot 3 : 50 unites
+Usine 2 -> Entrepot 1 : 30 unites
+Usine 2 -> Entrepot 2 : 120 unites
+
+Cout total minimum = 780 MRU
+\end{lstlisting}
+
+La solution optimale permet de satisfaire toutes les demandes
+avec un coût total minimal de \textbf{780 MRU}.
+
+%==============================================
+\section{Transport de Poissons -- Mauritanie}
+%==============================================
+
+\subsection{Description}
+Le fichier \texttt{poisson.py} traite le transport de poissons
+frais entre Nouadhibou et les villes de consommation.
+L'objectif est d'analyser :
+\begin{itemize}
+  \item le coût minimal de transport ;
+  \item le respect de la contrainte de périssabilité (12h max) ;
+  \item la satisfaction des demandes de chaque ville.
+\end{itemize}
+
+\subsection{Modèle mathématique}
+
+Le modèle utilisé est le modèle de transport avec contrainte
+de temps. Le taux de périssabilité est donné par :
+\[
+x_{pv} = 0 \quad \text{si } t_{pv} > T_{\max} = 12 \text{ heures}
+\]
+
+avec :
+\begin{itemize}
+  \item $p$ : port d'origine ;
+  \item $v$ : ville de destination ;
+  \item $t_{pv}$ : temps de trajet en heures.
+\end{itemize}
+
+\subsection{Extrait du code}
+
+\begin{lstlisting}
+for p in ports:
+    for v in villes:
+        if temps[p,v] > temps_max:
+            modele += x[p,v] == 0
+\end{lstlisting}
+
+Dans notre cas :
+\[
+T_{\max} = 12 \text{ heures}
+\]
+
+Comme tous les trajets sont inférieurs à 12h, le système
+est faisable.
+
+\subsection{Résultat obtenu}
+
+\begin{lstlisting}
+Tanit -> Rosso       : 80 tonnes (6h)  -> 30 400 MRU
+
+Verification des demandes :
+Nouakchott : 150/150 tonnes
+Rosso      : 80/80 tonnes
+Atar       : 100/100 tonnes
+\end{lstlisting}
+
+Ces résultats montrent que toutes les demandes sont satisfaites
+dans les délais requis.
+
+%==============================================
+\section{Conclusion}
+%==============================================
+
+Ce projet nous a permis d'appliquer trois méthodes de Recherche
+Opérationnelle avec Python.
+
+Nous avons étudié :
+\begin{itemize}
+  \item la programmation en nombres entiers pour le Knapsack ;
+  \item la programmation linéaire pour le transport ;
+  \item un modèle réel mauritanien pour le transport de poissons.
+\end{itemize}
+
+L'utilisation de Python et PuLP facilite la modélisation, le
+calcul et l'interprétation des résultats. Ce travail montre
+l'importance de la Recherche Opérationnelle dans la logistique,
+la santé et l'industrie.
+
+\end{document}
